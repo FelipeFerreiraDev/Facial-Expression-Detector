@@ -1,0 +1,21 @@
+{
+  "name": "expression-detector",
+  "module": "index.tsx",
+  "scripts": {
+    "start": "bun --watch run index.tsx"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@stricjs/router": "^5.0.4",
+    "@stricjs/utils": "^1.5.8",
+    "@tensorflow/tfjs-node": "^4.12.0",
+    "canvas": "^2.11.2",
+    "face-api.js": "^0.22.2"
+  }
+}

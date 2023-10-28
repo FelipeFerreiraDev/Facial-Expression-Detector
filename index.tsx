@@ -1,4 +1,4 @@
-// import { renderToString } from "react-dom/server";
+import db from "./src/db";
 
 const server = Bun.serve({
   hostname: "localhost",
@@ -48,5 +48,18 @@ async function fetchHandler(request: Request): Promise<Response> {
     return new Response(Bun.file("src/index.html"));
   }
 
+  if (url.pathname === "" || url.pathname === "/register-expression") {
+    const data = await request.json();
+    const { expression, timestamp } = data;
+    const insertQuery = `INSERT INTO expressions (neutral, happy, sad, angry, fearful, disgusted, surprised) VALUES 
+    ${expression.map((data: any) => `(${data.neutral}, ${data.happy}, ${data.sad}, ${data.angry}, ${data.fearful}, ${data.disgusted}, ${data.surprised})`).join(', ')}`;
+
+    db.run(insertQuery);
+
+    return new Response("OK");
+  }
+
   return new Response("Not Found", { status: 404 });
 }
+
+db

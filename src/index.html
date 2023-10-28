@@ -117,6 +117,7 @@
   <script>
     let forwardTimes = []
     let withBoxes = true
+    let expression = []
 
     function onChangeHideBoundingBoxes(e) {
       withBoxes = !$(e.target).prop('checked')
@@ -145,8 +146,21 @@
       updateTimeStats(Date.now() - ts)
 
       if (result) {
+        if (expression.length > 50) {
+          fetch('http://localhost:3333/register-expression', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ expression })
+          })
+          expression = []
+        } else {
+          expression.push(result.expressions)
+        }
 
-        console.log(result.expressions)
+
+
         const canvas = $('#overlay').get(0)
         const dims = faceapi.matchDimensions(canvas, videoEl, true)
 

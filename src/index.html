@@ -54,7 +54,7 @@
 
 
     <!-- ssd_mobilenetv1_controls -->
-    <span id="ssd_mobilenetv1_controls">
+    <!-- <span id="ssd_mobilenetv1_controls">
       <div class="row side-by-side">
         <div class="row">
           <label for="minConfidence">Min Confidence:</label>
@@ -73,7 +73,7 @@
           <i class="material-icons left">+</i>
         </button>
       </div>
-    </span>
+    </span> -->
     <!-- ssd_mobilenetv1_controls -->
 
     <!-- tiny_face_detector_controls -->
@@ -112,38 +112,46 @@
     </span>
     <!-- tiny_face_detector_controls -->
 
+    <button 
+    id="btnPlay"
+    class="waves-effect waves-light btn"
+    onclick="togglePlay()"
+  >
+    Iniciar
+  </button>
+
   </body>
 
   <script>
-    let forwardTimes = []
-    let withBoxes = true
-    let expression = []
+    let forwardTimes = [];
+    let withBoxes = true;
+    let expression = [];
+    let isPlaying = false;
 
     function onChangeHideBoundingBoxes(e) {
-      withBoxes = !$(e.target).prop('checked')
+      withBoxes = !$(e.target).prop('checked');
     }
 
     function updateTimeStats(timeInMs) {
-      forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30)
-      const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length
-      $('#time').val(`${Math.round(avgTimeInMs)} ms`)
-      $('#fps').val(`${faceapi.utils.round(1000 / avgTimeInMs)}`)
+      forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30);
+      const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length;
+      $('#time').val(`${Math.round(avgTimeInMs)} ms`);
+      $('#fps').val(`${faceapi.utils.round(1000 / avgTimeInMs)}`);
     }
 
     async function onPlay() {
-      const videoEl = $('#inputVideo').get(0)
+      const videoEl = $('#inputVideo').get(0);
 
-      if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
-        return setTimeout(() => onPlay())
+      if (videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+        return setTimeout(() => onPlay());
 
+      const options = getFaceDetectorOptions();
 
-      const options = getFaceDetectorOptions()
+      const ts = Date.now();
 
-      const ts = Date.now()
+      const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions();
 
-      const result = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
-
-      updateTimeStats(Date.now() - ts)
+      updateTimeStats(Date.now() - ts);
 
       if (result) {
         if (expression.length > 50) {
@@ -154,45 +162,61 @@
             },
             body: JSON.stringify({ expression })
           })
-          expression = []
+          expression = [];
         } else {
-          expression.push(result.expressions)
+          expression.push(result.expressions);
         }
 
+        const canvas = $('#overlay').get(0);
+        const dims = faceapi.matchDimensions(canvas, videoEl, true);
 
-
-        const canvas = $('#overlay').get(0)
-        const dims = faceapi.matchDimensions(canvas, videoEl, true)
-
-        const resizedResult = faceapi.resizeResults(result, dims)
-        const minConfidence = 0.05
+        const resizedResult = faceapi.resizeResults(result, dims);
+        const minConfidence = 0.05;
         if (withBoxes) {
-          faceapi.draw.drawDetections(canvas, resizedResult)
+          faceapi.draw.drawDetections(canvas, resizedResult);
         }
-        faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence)
+        faceapi.draw.drawFaceExpressions(canvas, resizedResult, minConfidence);
       }
 
-      setTimeout(() => onPlay())
+      if (isPlaying) {
+        setTimeout(() => onPlay());
+      }
     }
 
     async function run() {
       // load face detection and face expression recognition models
-      await changeFaceDetector(TINY_FACE_DETECTOR)
-      await faceapi.loadFaceExpressionModel('/')
-      changeInputSize(224)
+      await changeFaceDetector(TINY_FACE_DETECTOR);
+      await faceapi.loadFaceExpressionModel('/');
+      changeInputSize(224);
 
       // try to access users webcam and stream the images
       // to the video element
-      const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
-      const videoEl = $('#inputVideo').get(0)
-      videoEl.srcObject = stream
+      const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+      const videoEl = $('#inputVideo').get(0);
+      videoEl.srcObject = stream;
     }
 
     function updateResults() {}
 
+    function togglePlay() {
+      const btnPlay = $('#btnPlay');
+      if (isPlaying) {
+        // Se a aplicação estiver em execução, pare-a
+        isPlaying = false;
+        btnPlay.text('Iniciar');
+      } else {
+        // Se a aplicação não estiver em execução, inicie-a
+        isPlaying = true;
+        btnPlay.text('Parar');
+        initFaceDetectionControls();
+        run();
+        onPlay();
+      }
+    }
+
     $(document).ready(function() {
-      initFaceDetectionControls()
-      run()
+      // Não é necessário chamar initFaceDetectionControls() e run() aqui
+      // Essas funções serão chamadas apenas quando o botão for clicado
     })
   </script>
 </body>

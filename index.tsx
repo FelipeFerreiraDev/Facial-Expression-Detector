@@ -1,3 +1,5 @@
+import ChartJsImage from 'chartjs-to-image';
+import Bun from 'bun';
 import db from "./src/db";
 
 const server = Bun.serve({
@@ -63,3 +65,54 @@ async function fetchHandler(request: Request): Promise<Response> {
 }
 
 db
+
+
+// Função para converter e salvar o gráfico como imagem
+async function saveChartAsImage() {
+  const myChart = new ChartJsImage();
+  myChart.setConfig({
+    type: 'bar',
+    data: { labels: ['Hello world', 'Foo bar'], datasets: [{ label: 'Foo', data: [1, 2] }] },
+  });
+
+  myChart.toFile('mychart.png');
+
+
+  console.log('Gráfico salvo como imagem.');
+}
+
+await saveChartAsImage();
+
+
+
+import * as ExcelJS from 'exceljs';
+
+// Criar uma nova planilha
+const workbook = new ExcelJS.Workbook();
+const worksheet = workbook.addWorksheet('Dados');
+
+// Adicionar cabeçalho
+worksheet.addRow(['Nome', 'Idade', 'Cidade']);
+
+// Adicionar dados fictícios
+const data = [
+  { nome: 'João', idade: 25, cidade: 'São Paulo' },
+  { nome: 'Maria', idade: 30, cidade: 'Rio de Janeiro' },
+  { nome: 'Carlos', idade: 22, cidade: 'Belo Horizonte' },
+];
+
+// Adicionar linhas com os dados fictícios
+data.forEach(person => {
+  worksheet.addRow([person.nome, person.idade, person.cidade]);
+});
+
+// Salvar a planilha
+workbook.xlsx.writeFile('planilha_exemplo.xlsx')
+  .then(() => {
+    console.log('Planilha criada com sucesso!');
+
+    // criarGrafico();
+  })
+  .catch(error => {
+    console.error('Erro ao criar a planilha:', error);
+  });

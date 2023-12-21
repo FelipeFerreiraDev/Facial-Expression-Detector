@@ -16,6 +16,8 @@
     "@stricjs/utils": "^1.5.8",
     "@tensorflow/tfjs-node": "^4.12.0",
     "canvas": "^2.11.2",
+    "chartjs-to-image": "^1.2.2",
+    "exceljs": "^4.4.0",
     "face-api.js": "^0.22.2"
   }
 }

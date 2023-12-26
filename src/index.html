@@ -126,6 +126,7 @@
     let forwardTimes = [];
     let withBoxes = true;
     let expression = [];
+    let dates = [];
     let isPlaying = false;
 
     function onChangeHideBoundingBoxes(e) {
@@ -160,11 +161,15 @@
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ expression })
+            body: JSON.stringify({ expression, timestamp: dates })
           })
           expression = [];
         } else {
-          expression.push(result.expressions);
+          expression.push({timestamp: new Date().getTime(), ...result.expressions});
+          // let dataux = new Date();
+          // console.log(dataux);
+          console.log(expression);
+          dates.push(new Date());
         }
 
         const canvas = $('#overlay').get(0);

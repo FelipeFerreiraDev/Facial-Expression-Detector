@@ -7,6 +7,6 @@ const db = new Database("mydb.sqlite", { create: true });
 db.run("CREATE TABLE IF NOT EXISTS expressions (timestamp REAL, neutral REAL, happy REAL, sad REAL, angry REAL, fearful REAL, disgusted REAL, surprised REAL);");
 
 // Limpa a tabela de expressões
-db.run("DELETE FROM expressions;");
+// db.run("DELETE FROM expressions;");
 
 export default db;

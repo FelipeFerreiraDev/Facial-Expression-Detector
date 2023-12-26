@@ -1,7 +1,7 @@
 import ChartJsImage from 'chartjs-to-image';
 import Bun from 'bun';
 import db from "./src/db";
-import { generateExcelData, generateGraphicsDataColumn } from './src/functions';
+import { generateExcelData } from './src/functions';
 
 const server = Bun.serve({
   hostname: "localhost",
@@ -65,7 +65,6 @@ async function fetchHandler(request: Request): Promise<Response> {
 
   if (url.pathname === "" || url.pathname === "/post-generate-infos") {
     generateExcelData();
-    generateGraphicsDataColumn();
     return new Response("OK");
   }
 

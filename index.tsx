@@ -1,7 +1,6 @@
-import ChartJsImage from 'chartjs-to-image';
 import Bun from 'bun';
 import db from "./src/db";
-import { generateExcelData } from './src/functions';
+import { ExpressionPropsTimestamp, generateExcelData } from './src/functions';
 
 const server = Bun.serve({
   hostname: "localhost",
@@ -53,10 +52,10 @@ async function fetchHandler(request: Request): Promise<Response> {
 
   if (url.pathname === "" || url.pathname === "/register-expression") {
     const data = await request.json();
-    const { expression } = data;
+    let { expression } = data;
 
     const insertQuery = `INSERT INTO expressions (timestamp, neutral, happy, sad, angry, fearful, disgusted, surprised) VALUES 
-    ${expression.map((data: any) => `(${data.timestamp}, ${data.neutral}, ${data.happy}, ${data.sad}, ${data.angry}, ${data.fearful}, ${data.disgusted}, ${data.surprised})`).join(', ')}`;
+    ${expression.map((data: ExpressionPropsTimestamp) => `(${data.timestamp}, ${data.neutral}, ${data.happy}, ${data.sad}, ${data.angry}, ${data.fearful}, ${data.disgusted}, ${data.surprised})`).join(', ')}`;
 
     db.run(insertQuery);
 
